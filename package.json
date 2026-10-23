@@ -1,0 +1,38 @@
+{
+	"name": "@theseoframework/wp-plugin-performance",
+	"version": "0.1.0",
+	"description": "Xdebug hotspot profiling for WordPress plugins in Playground; diagnostics are not production performance measurements.",
+	"license": "GPL-3.0-only",
+	"homepage": "https://github.com/theseoframework/wp-plugin-performance",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/theseoframework/wp-plugin-performance.git"
+	},
+	"author": "Sybre Waaijer, CyberWire B.V. (https://cyberwire.nl/)",
+	"main": "run.js",
+	"bin": {
+		"wp-plugin-performance": "run.js"
+	},
+	"engines": {
+		"node": ">=20.18.0"
+	},
+	"scripts": {
+		"test": "node test/smoke.js",
+		"check": "node run.js --help"
+	},
+	"files": [
+		"run.js",
+		"lib/",
+		"mu-plugin/",
+		"skills/",
+		"examples/",
+		"docs/",
+		"tools/",
+		"test/",
+		"AGENTS.md",
+		"CLAUDE.md",
+		".cursor/rules/core.mdc",
+		".claude/skills/playground-performance/SKILL.md",
+		".github/copilot-instructions.md"
+	]
+}

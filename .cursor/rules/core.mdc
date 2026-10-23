@@ -1,0 +1,9 @@
+---
+description: Shared performance engine guidance and hotspot profiling workflow
+alwaysApply: true
+---
+
+Read and follow @AGENTS.md before working in this repository.
+For hotspot profiling, consumer integration or saved-report generation, use
+@skills/playground-performance/SKILL.md. The real consumer plugin supplies
+`--root`, its plan, recorded permission and measurement budget.

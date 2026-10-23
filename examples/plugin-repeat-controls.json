@@ -1,0 +1,11 @@
+{
+	"wp": [ "7.1.1" ], "php": [ "8.3" ],
+	"samples": 400, "rounds": 4, "warmups": 12,
+	"comparisonMode": "repeat-controls", "baselineCandidate": "core", "scenarios": [ "page" ],
+	"candidates": [
+		{ "id": "core", "baseline": true, "slug": "my-plugin", "path": ".", "mainFile": "my-plugin.php" },
+		{ "id": "repeat", "baseline": true, "negativeControl": true, "slug": "my-plugin", "path": ".", "mainFile": "my-plugin.php" },
+		{ "id": "before", "slug": "my-plugin", "path": ".local/profiling/before", "mainFile": "my-plugin.php", "setup": { "method": "plugin-defaults" }, "frontContains": [ "My plugin output marker" ] },
+		{ "id": "after", "slug": "my-plugin", "path": ".", "mainFile": "my-plugin.php", "setup": { "method": "plugin-defaults" }, "frontContains": [ "My plugin output marker" ] }
+	]
+}

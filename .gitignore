@@ -1,0 +1,12 @@
+## Consumer-private configuration, evidence and runtime output
+/.local/
+/node_modules/
+/state/
+/*.tgz
+/package-lock.json
+*.log
+*.tmp
+*.bak
+.DS_Store
+Thumbs.db
+

@@ -1,0 +1,8 @@
+{
+	"wp": "7.1.1",
+	"php": "8.3",
+	"warmups": 3,
+	"profiles": 3,
+	"scenarios": [ "home-blog", "home-static", "blog-page", "post", "page" ],
+	"plugin": { "slug": "my-plugin", "path": ".", "mainFile": "my-plugin.php" }
+}
