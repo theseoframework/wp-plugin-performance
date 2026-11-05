@@ -267,7 +267,11 @@ async function main() {
 	await require( './probes' ).checkProbes( output );
 	await require( './clocks' ).checkClocks( output );
 	await require( './clocks' ).checkThermalContext( output );
-	require( './consumer' ).main();
+	const consumerEvidence = require( './consumer' ).main();
+	// Reproduce macOS /var -> /private/var resolution on every test platform.
+	const temporaryAlias = path.join( output, 'consumer-temp-alias' );
+	fs.symlinkSync( consumerEvidence, temporaryAlias, process.platform === 'win32' ? 'junction' : 'dir' );
+	require( './consumer' ).main( temporaryAlias );
 	const mock = await readTemperature( [ process.execPath, '-e', 'process.stdout.write(JSON.stringify([{sensor:"synthetic CPU",celsius:55.2}]))' ] );
 	assert.equal( mock.celsius, 55.2 );
 	const absent = await readTemperature( [ process.execPath, '-e', 'process.stdout.write("[]")' ] );

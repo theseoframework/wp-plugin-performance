@@ -12,12 +12,14 @@ const { spawnSync } = require( 'child_process' );
 /**
  * Checks real CLI boundaries without starting WordPress or downloading packages.
  *
+ * @param {string} temporaryRoot Existing temporary directory, possibly symlinked.
  * @return {string}
  */
-function main() {
+function main( temporaryRoot = os.tmpdir() ) {
 
 	const engine = path.resolve( __dirname, '..' );
-	const temporary = fs.mkdtempSync( path.join( os.tmpdir(), 'wpp-consumer-test-' ) );
+	// Node resolves the script's __dirname through links, including macOS /var.
+	const temporary = fs.realpathSync( fs.mkdtempSync( path.join( temporaryRoot, 'wpp-consumer-test-' ) ) );
 	const consumer = path.join( temporary, 'consumer' );
 	const script = path.join( consumer, '.cursor/skills/playground-performance/scripts/performance.js' );
 	const permission = path.join( consumer, '.local/playground/permission.txt' );

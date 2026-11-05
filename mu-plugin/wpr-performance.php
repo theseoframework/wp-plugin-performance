@@ -2,7 +2,7 @@
 /**
  * Local Playground fixture and keyed benchmark control plane.
  *
- * @package The_SEO_Framework\Playground
+ * @package WP_Plugin_Performance
  */
 
 defined( 'ABSPATH' ) or die;
@@ -23,7 +23,7 @@ add_action( 'shutdown', 'wpr_performance_sql_diagnostics', PHP_INT_MAX );
 /**
  * Captures the previous query's suppressed error before WordPress resets it.
  *
- * @since 5.2.1
+ * @since 0.1.0
  *
  * @param string $query Next query.
  * @return string Unchanged query.
@@ -36,7 +36,7 @@ function wpr_performance_check_query( $query ) {
 /**
  * Keeps HTTP 200 responses with failed SQL out of accepted performance blocks.
  *
- * @since 5.2.1
+ * @since 0.1.0
  */
 function wpr_performance_sql_diagnostics() {
 
@@ -55,7 +55,7 @@ function wpr_performance_sql_diagnostics() {
 /**
  * Reports native WordPress query identity, detecting homepage rewrite fallbacks.
  *
- * @since 5.2.1
+ * @since 0.1.0
  */
 function wpr_performance_route() {
 
@@ -86,7 +86,7 @@ function wpr_performance_route() {
 /**
  * Records the native admin screen identity outside the page's HTML.
  *
- * @since 5.2.1
+ * @since 0.1.0
  *
  * @param WP_Screen $screen Current admin screen.
  */
@@ -98,7 +98,7 @@ function wpr_performance_admin_route( $screen ) {
 /**
  * Makes a newly issued login cookie available when creating the REST nonce.
  *
- * @since 5.2.1
+ * @since 0.1.0
  *
  * @param string $cookie Logged-in cookie.
  */
@@ -110,7 +110,7 @@ function wpr_performance_sync_cookie( $cookie ) {
  * Echoes a per-request execution token and handles authenticated setup commands.
  * Normal benchmark requests use WordPress's real authentication cookies.
  *
- * @since 5.2.1
+ * @since 0.1.0
  */
 function wpr_performance_request() {
 
@@ -191,7 +191,7 @@ function wpr_performance_request() {
 /**
  * Finishes a control request.
  *
- * @since 5.2.1
+ * @since 0.1.0
  *
  * @param array $data   Result.
  * @param int   $status HTTP status.
@@ -208,7 +208,7 @@ function wpr_performance_reply( $data, $status = 200 ) {
  * Creates the same content, terms, URLs, and front-page frames for every plugin.
  * Defaults and plugin UI features are left to the plugin and its setup profile.
  *
- * @since 5.2.1
+ * @since 0.1.0
  *
  * @return array Fixture IDs and request paths.
  */
@@ -303,7 +303,7 @@ function wpr_performance_seed() {
 /**
  * Adds the same local logo to every site's media library for setup wizards.
  *
- * @since 5.2.1
+ * @since 0.1.0
  *
  * @return array Logo attachment and URL.
  */
@@ -331,7 +331,7 @@ function wpr_performance_logo() {
 /**
  * Describes the running versions, active plugins, theme, PHP, and cache policy.
  *
- * @since 5.2.1
+ * @since 0.1.0
  *
  * @return array Runtime manifest.
  */
