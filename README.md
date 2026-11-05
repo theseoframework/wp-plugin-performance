@@ -7,6 +7,28 @@ function/edge CSV and complete JSON. Node built-ins power the engine; it uses th
 already installed [wp-plugin-regression](https://github.com/theseoframework/wp-plugin-regression)
 launcher and an existing matching Playground Xdebug artifact.
 
+**Playground diagnostics do not predict production performance.**
+
+## Installation
+
+### Instant implementation
+
+In your open plugin repository, tell your AI agent:
+
+```md
+Implement https://github.com/theseoframework/wp-plugin-performance for this repo.
+```
+
+### Manual
+
+1. Download or copy this repository's files into a private folder outside your plugin source.
+2. Prepare the existing Node, wp-plugin-regression and Xdebug dependencies listed under [Requirements and configuration](#requirements-and-configuration). This engine itself needs no `npm install`.
+3. Copy `skills/playground-performance/` into your plugin's `.cursor/skills/playground-performance/` and configure the private engine locations as described below.
+4. Open a terminal in the engine folder and run `node run.js --help`. Follow [Capture profiles](#capture-profiles) when ready to profile.
+
+Before an agent acquires missing dependencies or launches WordPress, obtain the
+user's decision and follow the recorded permission workflow below.
+
 ## What these results mean
 
 **Playground diagnostics do not predict production performance.** PHP-WASM,
@@ -21,7 +43,7 @@ establish an equivalent normal-request improvement. Calls count profiler entries
 recursive calls and generator resumptions need interpretation. This tool does
 not establish which plugin is fastest or publish competitor rankings.
 
-## Requirements and installation
+## Requirements and configuration
 
 - Node 20.18 or newer for offline inspection and tests. Live profiling additionally
   requires a JSPI-capable Node runtime for the extension-manifest workflow;
