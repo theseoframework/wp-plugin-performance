@@ -98,9 +98,10 @@ node .cursor/skills/playground-performance/scripts/performance.js profile --conf
 ```
 
 The default example captures five routes: blog homepage, static homepage,
-posts page, post and page. Each receives three unprofiled warmups and three
-triggered profiles: **30 page requests**, plus untimed setup/control requests.
-Override with `--warmups=3 --profiles=3 --scenarios=home-static,post`.
+posts page, post and page. Three unprofiled warmups and one triggered capture
+per route produce **20 page requests and five raw files**, plus setup/control
+requests. For a closer look at selected routes, use
+`--profiles=3 --scenarios=home-static,post`.
 Each capture remains separate; routes and repeated samples are never pooled into
 a product score. Other supported GET scenarios include category, tag, search,
 404, dashboard, posts-list, pages-list, post-editor and page-editor. Unsupported
@@ -116,8 +117,8 @@ WordPress receives an independent copy of the selected plugin mounts, never
 writable working-tree files. Both original and executed PHP fingerprints must
 remain unchanged. Snapshots and evidence stay under the private run directory.
 Only that owned session is stopped, including on failure; unrelated sessions
-are never stopped. Site data remains disposable launcher state; raw evidence is
-retained. Do not run this MU instrumentation on production sites.
+are never stopped. Site data remains disposable launcher state. Do not run this
+MU instrumentation on production sites.
 
 ## Inspect hotspots
 
@@ -145,6 +146,41 @@ Saved-run imports retain recorded runtime, plugin/source hashes, request identit
 and the original manifest hash in HTML, Markdown, JSON and `provenance.json`.
 Missing historical fields are explicitly unknown; a standalone file cannot
 establish its hosting environment from its header alone.
+
+## Retain or prune raw profiles
+
+Ask whether to keep raw Cachegrind files or prune them after the saved report
+is verified. With the user's choice, set `"rawRetention": "prune"` or
+`"rawRetention": "keep"` in the consumer's private
+`.local/playground/performance/engine.json`. Use
+`--raw-retention=prune` or `--raw-retention=keep` to override it for one capture
+run. When unset, raw files stay available for a later decision.
+
+Automatic pruning runs after the site has stopped and the completed report has
+been written. For an older run, preview the file count and bytes first:
+
+```text
+node run.js prune --root ../my-plugin --input .local/profiling/saved-run
+node run.js prune --root ../my-plugin --input .local/profiling/saved-run --apply
+```
+
+Pruning verifies the report, manifest and raw hashes. It removes only the raw
+files named in that run's manifest and records them in `raw-prune.json`.
+Cleanup skips runs marked `keep`, incomplete runs and runs with missing evidence.
+The saved HTML, JSON, CSVs and provenance remain usable after pruning. Keep raw
+files when you need KCachegrind, a fresh parse or evidence for an investigation.
+
+Older analysis scripts may have left separate `cachegrind.*.json` files.
+Use Python 3 and the helper below to preview one exact cache directory, then
+consolidate those files into `parsed-cache.zip`. It verifies each member's
+SHA-256 before removing loose files. Restore before running a historical
+script that reads those files by name.
+
+```text
+python tools/parsed-cache.py pack --input path/to/parsed-profiles
+python tools/parsed-cache.py pack --input path/to/parsed-profiles --apply
+python tools/parsed-cache.py restore --input path/to/parsed-profiles --apply
+```
 
 ## Validate an improvement
 

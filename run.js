@@ -13,6 +13,7 @@ const USAGE = `Usage: node run.js <command> --root <consumer> [flags]
 Commands:
   profile   Capture Xdebug profiles of one local plugin (--config).
   hotspots  Inspect saved Cachegrind or a profile run (--input, --output).
+  prune     Preview raw-file cleanup for a completed run (--input, --apply).
   run       Optional unprofiled timing of the same plugin (--config).
   prepare   Leave one owned site running for native wizard setup.
   resume    Measure a prepared --session, then stop that site.
@@ -32,7 +33,8 @@ Run flags: --config <plan.json>, --smoke, --wp=latest,7.0, --php=auto,8.3,
 Live commands require the consumer's .local/playground/permission.txt:
 PLAYGROUND=True|False. Missing, invalid and False consent never launch or install.
 No command installs dependencies, clones repositories or alters Git state.
-Profile flags: --config <plan>, --warmups=3, --profiles=3, --output <new-dir>.
+Profile flags: --config <plan>, --warmups=3, --profiles=1, --output <new-dir>,
+               --raw-retention=keep|prune.
 Offline flags: --input <profile-or-run>, --output <new-dir>, --plugin-prefix <VFS-path>.
 Playground diagnostics do not predict production performance. Confirm native
 gains with profiling disabled. Inclusive costs overlap; call overhead is amplified.
@@ -59,6 +61,11 @@ async function main( argv = process.argv.slice( 2 ) ) {
 			return require( './lib/profile' ).main( args );
 		case 'hotspots':
 			return require( './lib/profile' ).offline( args );
+		case 'prune': {
+			const result = require( './lib/raw-retention' ).prune( args );
+			console.log( JSON.stringify( result, null, '\t' ) );
+			return result;
+		}
 		case 'run':
 			return benchmark.main( args );
 		case 'prepare':

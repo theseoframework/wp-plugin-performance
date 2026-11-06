@@ -91,11 +91,11 @@ function engineModule( relative ) {
 function main( argv = process.argv.slice( 2 ) ) {
 
 	if ( ! argv.length || argv.includes( '--help' ) ) {
-		console.log( 'Usage: node performance.js <profile|hotspots|run|prepare|resume|stop|report|export|doctor> [flags]\nShared source: https://github.com/theseoframework/wp-plugin-performance' );
+		console.log( 'Usage: node performance.js <profile|hotspots|prune|run|prepare|resume|stop|report|export|doctor|test> [flags]\nShared source: https://github.com/theseoframework/wp-plugin-performance' );
 
 		return;
 	}
-	const offline = [ 'hotspots', 'report', 'export', 'doctor', 'test' ].includes( argv[0] );
+	const offline = [ 'hotspots', 'prune', 'report', 'export', 'doctor', 'test' ].includes( argv[0] );
 	if ( ! offline && ! readPermission() ) {
 		console.log( 'Performance tests skipped (PLAYGROUND=False).' );
 

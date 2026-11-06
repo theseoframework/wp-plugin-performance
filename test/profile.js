@@ -4,7 +4,8 @@ const fs = require( 'fs' );
 const path = require( 'path' );
 const { parse } = require( '../lib/cachegrind' );
 const { write } = require( '../lib/hotspot-report' );
-const { configuration, completedProfile } = require( '../lib/profile' );
+const { configuration, completedProfile, offline, reportMetadata } = require( '../lib/profile' );
+const { JOURNAL, policy, prune } = require( '../lib/raw-retention' );
 const disclaimer = require( '../lib/disclaimer' );
 
 const fixture = `version: 1
@@ -48,7 +49,8 @@ async function checkProfile( output ) {
 	const recursive = parse( fixture.replace( 'cfl=(2)', 'cfl=(1)' ).replace( 'cfn=(2)', 'cfn=(1)' ) );
 	assert.equal( recursive.edges[0].caller, recursive.edges[0].callee );
 	const plan = { wp: '7.1.1', php: '8.3', plugin: { slug: 'my-plugin', mainFile: 'main.php' } };
-	assert.equal( configuration( plan ).profiles, 3 );
+	assert.equal( configuration( plan ).profiles, 1 );
+	assert.equal( configuration( { ...plan, profiles: 2 }, { profiles: '3' } ).profiles, 3 );
 	assert.throws( () => configuration( { ...plan, php: 'auto' } ), /explicit/ );
 	assert.throws( () => configuration( { ...plan, candidates: [] } ), /one local plugin/ );
 	assert.throws( () => configuration( { ...plan, plugin: { ...plan.plugin, baseline: true } } ), /one local plugin/ );
@@ -68,6 +70,56 @@ async function checkProfile( output ) {
 	assert( page.includes( '\\u003c/script' ) );
 	assert.equal( JSON.parse( fs.readFileSync( path.join( report, 'hotspots.json' ) ) ).profiles.length, 1 );
 	assert.throws( () => write( report, [] ), /EEXIST/ );
+	checkRetention( output, parsed );
+}
+
+/** Verifies deletion scope, complete evidence, preview and safe repeat calls. */
+function checkRetention( output, parsed ) {
+
+	assert.equal( policy(), undefined );
+	assert.equal( policy( undefined, 'prune' ), 'prune' );
+	assert.equal( policy( 'keep', 'prune' ), 'keep' );
+	assert.throws( () => policy( true ), /keep or prune/ );
+	const run = path.join( output, 'retention-test' );
+	const raw = path.join( run, 'raw' );
+	fs.mkdirSync( raw, { recursive: true } );
+	const manifestFile = path.join( run, 'manifest.json' );
+	const profiles = [ 0, 1 ].map( index => ( {
+		scenario: 'post', index, raw: `raw/cachegrind.test.${index}`, sha256: parsed.sha256,
+		requestToken: `request-${index}`,
+	} ) );
+	for ( const item of profiles ) fs.writeFileSync( path.join( run, item.raw ), fixture );
+	const extra = path.join( raw, 'cachegrind.unlisted' );
+	fs.writeFileSync( extra, fixture );
+	const manifest = { kind: 'wp-hotspot-run-v1', complete: true, stopped: true, failures: [], profiles };
+	const bytes = JSON.stringify( manifest );
+	fs.writeFileSync( manifestFile, JSON.stringify( { ...manifest, stopped: false } ) );
+	assert.throws( () => prune( { input: run, apply: true } ), /complete, stopped/ );
+	fs.writeFileSync( manifestFile, JSON.stringify( { ...manifest, rawRetention: 'keep' } ) );
+	assert.throws( () => prune( { input: run, apply: true } ), /marked to keep/ );
+	fs.writeFileSync( manifestFile, bytes );
+	assert.throws( () => prune( { input: run, apply: true } ), /Missing retention evidence/ );
+	write( run, profiles.map( request => ( { label: `post ${request.index}`, request, ...parsed } ) ), reportMetadata( manifest, bytes ) );
+	const htmlFile = path.join( run, 'report.html' );
+	const page = fs.readFileSync( htmlFile, 'utf8' );
+	fs.writeFileSync( htmlFile, page.slice( 0, -9 ) );
+	assert.throws( () => prune( { input: run, apply: true } ), /HTML is incomplete/ );
+	fs.writeFileSync( htmlFile, page );
+	const first = path.join( run, profiles[0].raw );
+	const second = path.join( run, profiles[1].raw );
+	fs.appendFileSync( second, '\n' );
+	assert.throws( () => prune( { input: run, apply: true } ), /hash changed/ );
+	assert( fs.existsSync( first ) );
+	fs.writeFileSync( second, fixture );
+	assert.equal( prune( { input: run } ).files, 2 );
+	assert( fs.existsSync( first ) && fs.existsSync( second ) );
+	assert( ! fs.existsSync( path.join( run, JOURNAL ) ) );
+	assert.equal( prune( { input: run, apply: true } ).removed, 2 );
+	assert( fs.existsSync( extra ) );
+	assert.equal( fs.readFileSync( htmlFile, 'utf8' ), page );
+	assert.equal( fs.readFileSync( manifestFile, 'utf8' ), bytes );
+	assert.equal( prune( { input: run, apply: true } ).alreadyPruned, 2 );
+	assert.throws( () => offline( { input: run, output: run + '-offline' } ), /Raw profiles were pruned/ );
 }
 
 module.exports = { checkProfile, fixture };

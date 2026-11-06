@@ -21,8 +21,10 @@ repository guidance. Do not duplicate the runtime or create consent flags.
 node .cursor/skills/playground-performance/scripts/performance.js --help
 node .cursor/skills/playground-performance/scripts/performance.js profile --config .local/profiling/plan.json
 node .cursor/skills/playground-performance/scripts/performance.js hotspots --input .local/profiling/run --output .local/profiling/review
+node .cursor/skills/playground-performance/scripts/performance.js prune --input .local/profiling/run
 ```
 
-The last operation is offline. Reports and raw evidence stay private to the
-consumer. Editor discovery does not grant filesystem, installation or live
-profiling permission.
+The last two operations are offline. The cleanup command previews the raw files
+until authorized with `--apply`. Reports and retained raw evidence stay private
+to the consumer. Editor discovery does not grant installation or live profiling
+permission.

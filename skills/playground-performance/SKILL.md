@@ -34,8 +34,8 @@ Before any live command, read the consumer's
 - True: honor the authorized request and budget without reconfirming.
 
 Never infer consent from installation, copy another consumer's permission or
-write the flag without an actual decision. Offline `hotspots`, report rebuilding,
-help, doctor and synthetic tests do not authorize or start WordPress.
+write the flag without an actual decision. Offline `hotspots`, `prune`, report
+rebuilding, help, doctor and synthetic tests do not start WordPress.
 
 Use already installed engines and matching Xdebug artifacts. Do not install
 tools or download dependencies unless separately authorized. Missing Xdebug
@@ -58,8 +58,10 @@ supported by the shared command. Pass the real consumer as `--root`.
 Adapt the engine's `examples/profile.json` to the actual local plugin.
 Require explicit installed WordPress and PHP versions. The plan has one
 `plugin`, not a product comparison matrix. Start with relevant GET routes.
-Explain the budget: five routes × (three warmups + three profiles) = thirty
-page requests, plus setup/control probes. Do not expand the user's budget.
+Start with one capture per route. Five routes × (three warmups + one profile)
+means twenty page requests and five raw files, plus setup/control probes. Use
+`--profiles` to repeat selected routes when the user wants a closer look.
+Do not expand the user's budget.
 
 ```text
 node .cursor/skills/playground-performance/scripts/performance.js profile --config .local/profiling/plan.json
@@ -78,8 +80,9 @@ operations are outside that guard's scope.
 ## Inspect and evaluate
 
 Deliver the offline `report.html`, `hotspots.json`, `functions.csv`,
-`edges.csv`, `provenance.json` and raw Cachegrind paths. Use plugin-only self time to find local
-work, then inspect callers/callees for child costs and repeated entries.
+`edges.csv` and `provenance.json`. Include raw paths if retained. Use plugin-only
+self time to find local work, then inspect callers/callees for child costs and
+repeated entries.
 Do not add overlapping inclusive costs or mistake generators for independent
 full executions. Keep requests and route cohorts separate.
 
@@ -92,6 +95,24 @@ provenance. Rebuilding reports is offline and must preserve old evidence.
 Saved-run reports retain recorded runtime and source identity, request records
 and a hash of the original manifest. Missing historical fields stay unknown.
 Keep paths, credentials, profiles and source backups consumer-private.
+
+## Raw-file retention
+
+Check `rawRetention` in the consumer's private engine.json. If no preference
+exists, ask whether to prune after a verified report or keep raw profiles.
+Record `prune` or `keep` only from an actual choice. Use
+`profile --raw-retention=prune|keep` for a one-run choice. Without a decision,
+capture and save normally and keep the raw files.
+
+Keep raw profiles for KCachegrind, re-parsing or an open investigation. For
+existing completed runs, preview `prune --input <run>` and apply with
+`--apply` only within the user's authorized scope. The engine verifies the
+saved report before pruning. After pruning, use the saved HTML or JSON.
+
+For loose legacy `cachegrind.*.json` caches, use the installed engine's
+`tools/parsed-cache.py` to preview and pack one cache directory into a
+verified ZIP. Restore the loose files before rerunning a historical script
+that reads them by name. See the engine README for commands.
 
 After exact output/filter checks, optionally use unprofiled same-plugin
 before/after timing. Read the installed engine's `docs/comparisons.md`,

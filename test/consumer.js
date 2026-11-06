@@ -61,6 +61,7 @@ function main( temporaryRoot = os.tmpdir() ) {
 	fs.writeFileSync( permission, 'PLAYGROUND=False\n' );
 	assert.equal( invoke( 'profile' ).status, 0 );
 	assert.equal( invoke( 'hotspots' ).status, 23 ); // Offline inspection does not launch WordPress or need live consent.
+	assert.equal( invoke( 'prune' ).status, 23 );
 	result = spawnSync( process.execPath, [ path.join( engine, 'run.js' ), 'run', '--root', consumer ], {
 		cwd: engine, encoding: 'utf8', windowsHide: true,
 	} );
